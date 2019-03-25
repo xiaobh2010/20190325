@@ -1,0 +1,297 @@
+1.生成器generator（用算法来动态提供数据）
+不占内存
+2.迭代相关函数
+zip(iter1,iter2,...) 
+enumerate(iter,start=0)
+3.字节串和字节数组
+存储以字节为单位的数据
+字节串 bytes
+字节串里面存的都是整数
+用ABCD表示64 65 66 67
+字节数组 bytearray
+4.生成器函数
+def pow2(iterable):    #generator object
+	for x in iterable:
+		yield x**2
+for x in pow2(range(10)):
+	print(x)
+5.生成器表达式
+(x for x in iterable)	
+
+dict(zip(iter1,iter2))
+6. 字节串不可变，字节数组能改变
+>>> B=b'ABCD'
+>>> B[0]=70 #不可变
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'bytes' object does not support item assignment
+================================================================
+>>> B=bytearray(b'ABCD')
+>>> B[0]=70
+>>> B
+bytearray(b'FBCD')
+
+7.序列
+str,list,tuple,bytes,bytearray
+
+8.文件
+文件是用于数据存储的单位
+文件通常用来长期存储数据
+文件中的数据是以字节为单位进行顺序存储的
+
+文件的操作流程
+1.打开文件
+2.读写文件
+3.关闭文件
+注：任何操作系统，一个应用程序同时打开文件的数量有最大数限制
+
+内存-->外存
+RAM 硬盘
+U盘
+SSD硬盘
+-----------
+文件的打开函数
+open(file,mode='rt') 用于打开一个文件，返回此文件流对象
+如果文件打开失败，则会触发OSError类型的错误
+
+文件的关闭方法
+F.close() #关闭文件，释放系统资源,把文件的内容同步到磁盘上
+文件的读写方法参见文件
+程序如下：
+try:
+	f=open('/home/tarena/test/myfile.txt')  
+	#windows下 f=open('myfile.txt',encoding='gbk')  
+	#linux下 f=open('myfile.txt',encoding='utf-8')  
+	s=f.read()
+	print(s)
+	f.close()
+except OSError:
+	print('文件打开失败')
+
+----------------------------------------------------------
+f.read(size) 从一个文件流中最多读取size个字符，不给参数，默认取文件全部参数返回
+f.readlines() 返回每行字符串的列表
+-----------------------------------------------------------
+文件的读方法：
+	f.read([n])
+	f.readline()
+	f.readlines()
+	详见文档
+文件的写方法
+	f.write(s) #写入字符串或字节串到文件中
+	f.writelines(lst) #写入字符串或字节串列表到文件中
+读文件模式
+	r 只读
+写文件模式
+	w 只写，可创建文件
+	x 只写，当文件已存在时不创建文件，文件不存在时创建文件
+	a 追加写
+-------------------------------------------------------------
+f.write(xxx) xxx必须为字符串
+示例：
+f=open('mynote.txt','w')
+#创建文件，如果文件内容存在会覆盖原有内容
+# f.write('xxxx')
+# f.write('233333')
+L=['123','456']
+f.writelines(L)
+f.close()
+--------------------------------------------------------------
+练习：
+1.自己写一个read_from_file()函数，此函数从文件si.txt中读取学生信息的内容，形成字典的列表并返回
+文件si.txt内容
+xiaozhang,20,100
+xiaoli,18,98
+xiaowang,19,70
+返回字典的列表：
+[{'name':xiaozhang,'age':20,'score':100},{xiaoli,18,98},{xiaowang,19,70}]
+程序如下：
+def read_from_file():
+    L=[]
+    try:
+        f=open('si.txt')
+        while True:
+            s=f.readline()
+            if s=='':
+                break
+            target=str(s).rstrip('\n')
+            targ1=target.split(',')
+            #print(targ1)
+            L.append(dict(name=targ1[0],age=targ1[1],score=targ1[2]))
+        return L
+    except OSError:
+        print('打开文件失败')        
+
+res=read_from_file()
+print(res)
+------------------------------------------
+while True:
+	try:
+
+	except ValueError:
+		print()
+		continue
+------------------------------------------
+文件的迭代读取
+	文本文件流对象时一个可迭代对象，可以用for语句来遍历每一行数据
+	迭代过程将以'\n'作为分隔符依次获取
+示例：
+	fr=open('myfile.txt')
+	for line in fr:
+		print(line)
+
+标准输入输出文件
+	sys.stdin 标准输入我呢间
+	sys.stdout 标准输出文件
+	sys.stderr 标准错误输出文件
+	模块名：sys
+	注：标准输入输出文件不需要打开关闭就可以使用
+
+示例：
+import sys
+sys.stdout.write('这是标准输出打印的第一行\n')
+sys.stdout.write('这是标准输出打印的第二行\n')
+sys.stdout.close()  #关掉此文件会引起输出异常
+#Traceback (most recent call last):
+  File "stdout.py", line 7, in <module>
+    print('这是标准输出打印的第三行\n')
+ValueError: I/O operation on closed file.
+
+print('这是标准输出打印的第三行\n')	
+
+========================================================
+import sys
+s=sys.stdin.readline()
+print('刚才读取',len(s),'个字节')
+print('内容是:',s)
+sys.stdout.close() #关掉此文件会引起input函数异常
+========================================================
+二进制文件操作
+	二进制文件模式字符：
+	默认文件中存储都是以字节(byte)为单位的数据，通常有人为的格式对二进制文件读取
+	需要用字节串（bytes）进行操作
+	与文本文件操作不同，二进制文件读写过程中不会进行自动的编解码转换
+
+fr=open('111.png','rb')
+b=fr.read(4)
+--------------------------------------------
+f=open('binaty.txt','wb')
+b=bytes(range(256))  #可迭代类型，bytes(n) 里面写整数就全是0
+f.write(b)
+f.close()
+--------------------------------------------
+bytes(n) #得到n个值为0的字节串
+
+vscode安装hexdump
+选择左侧最小边的图标，在商店中搜索
+鼠标右键选择文件，点击show hexdump显示文件的字节编码
+=======================================================
+二进制文件的随机访问
+f.tell() 返回当前文件的读写位置（从文件头以字节为单位）
+示例：
+f=open('xx.txt')
+f.tell()
+print('刚开始时读写位置',f.tell())
+f.read(2)
+print('现在的读写位置',f.tell())
+
+---------------------------------------------------
+f.seek() 设置文件读写位置
+格式：
+	f.seek(偏移量,whence=相对位置)
+	偏移量：
+	大于0代表向文件末尾方向移动
+	小于0代表向文件头方向移动
+	------------------------------
+	相对位置：
+	0代表从文件头开始偏移
+	1代表从当前读写位置开始偏移
+	2代表从文件尾开始偏移
+示例：
+f=open('xx.txt','rb')
+print(f.read(2))
+f.seek(2,1)
+print(f.read(2))
+print('现在的读写位置',f.tell())
+#使用seek（）方法报错：“io.UnsupportedOperation: can't do nonzero cur-relative seeks”错误的原因
+#文本文件中，没有使用b模式选项打开的文件，只允许从文件头开始计算相对位置，从文件尾计算时就会引发异常。将  f=open("aaa.txt","r+")  改成
+#f = open("aaa.txt","rb")   就可以了
+程序运行结果：
+b'AB'
+b'EF'
+现在的读写位置 6
+
+=================================================================
+f.flush()   #清道缓冲区
+硬盘（块设备）
+512字节
+--------------------------
+应用层
+操作系统
+硬件
+-----------------------------------------------
+文件小结：
+	打开模式：
+	't' 文本文件打开
+	'b' 二进制文件打开（自动进行编码）
+
+	操作方式：
+	读：
+		f.read(n)
+		f.readline()
+		f.readlines()
+	写：
+		f.write(字节串或字符串)
+		f.write(字节串或字符串列表)
+***************************************************************************
+汉字编码
+	国标系列 
+	GB18030（二字节或四字节编码，27533个汉字）
+	GBK(二字节编码，21003个汉字)
+	GB2312（二字节编码，6763个汉字+682个字符）
+	（windows常用）
+
+	国际标准
+		UNICODE32(四字节编码)<--->utf-8
+		UNICODE16（二字节编码）
+		（Linux/IOS/Android常用）
+============================================================================
+	UTF-8(8 bit-UNICODE Transformation Format)	
+	0x0000~0x007F 1字节表示
+	0x0080~0x07FF 2字节表示
+	0x0800~0xFFFF 3字节表示（中文在此）
+
+python的编码字符串
+	'gb2312'
+	'gbk'
+	'GB18030'
+	'utf-8'
+	'ascii'
+示例：
+	s='ABC中文'
+	b1=s.encode('gbk') #b1为7字节（中字用2个字节表示）
+	b2=s.encode('utf-8') #b2为9字节
+
+
+编码注释：
+	在源文件的第一行或第二行写入如下内容为编码注释
+	#-*- coding:gbk -*-
+	或
+	-*- coding:utf-8 -*-
+	作用：
+	告诉解释执行器，当前文件的编码类型是什么
+	示例：
+在ubuntu下
+#encoding=gbk
+print('你好中国')
+程序运行结果：
+tarena@tedu:~/test$ python3 gbkhello.py 
+  File "gbkhello.py", line 1
+SyntaxError: encoding problem: gbk	
+--------------------------------------
+在ubuntu下
+#encoding=utf-8
+print('你好中国')
+程序运行结果：
+tarena@tedu:~/test$ python3 gbkhello.py 
+你好中国
